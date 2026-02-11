@@ -1,0 +1,231 @@
+Prompt: Can you include the HTML for a bootstrap modal in the index.html. The modal id 
+should be event_modal and should inclue a form with event_name, event_weekday (select tag),
+ time (type tag), event_modality (dropdown (inperson/remote) if inperson is elected then a 
+ event_location and event_attendees fields should appear. If remote option is slected then
+event_remote_url and event_attendees should be shown), event_location, event_remote_url,
+event_attendees. Add appropriate validations to the event modal. One such is the Remote 
+URL and this must use the pattern attribute (for urls, so create a complex regex). To 
+conditionally display the location or remote URL implement a updateLocationOptions() in 
+script.js. Call it on a onchange event in the same select element. Additioanlly, create 
+a "Close" and "save event" button to the modal. These should save the data from the form 
+and close the modal. The modal should also open with empty fields. To open the modal whent
+eh create event button is clicked create a attribute "data-bs-toggle" and "data-bs-target"
+and update those attribtes to the create event button. For all the code that you create try
+to create is seperate and spaced out from the original code, in block format if possible.
+
+<button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#event_modal">Create Event</button>
+
+<!-- Bootstrap Event Modal -->
+<div class="modal fade" id="event_modal" tabindex="-1" aria-labelledby="event_modal_label" aria-hidden="true">
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+    <h1 class="modal-title fs-5" id="event_modal_label">Create Event</h1>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+    <form id="event_form" novalidate>
+        <!-- Event Name -->
+        <div class="mb-3">
+        <label for="event_name" class="form-label">Event Name</label>
+        <input type="text" class="form-control" id="event_name" name="event_name" required>
+        <div class="invalid-feedback">Event name is required.</div>
+        </div>
+
+        <!-- Event Weekday -->
+        <div class="mb-3">
+        <label for="event_weekday" class="form-label">Weekday</label>
+        <select class="form-select" id="event_weekday" name="event_weekday" required>
+            <option value="" disabled selected>Select a weekday</option>
+            <option value="sunday">Sunday</option>
+            <option value="monday">Monday</option>
+            <option value="tuesday">Tuesday</option>
+            <option value="wednesday">Wednesday</option>
+            <option value="thursday">Thursday</option>
+            <option value="friday">Friday</option>
+            <option value="saturday">Saturday</option>
+        </select>
+        <div class="invalid-feedback">Please select a weekday.</div>
+        </div>
+
+        <!-- Time -->
+        <div class="mb-3">
+        <label for="event_time" class="form-label">Time</label>
+        <input type="time" class="form-control" id="event_time" name="event_time" required>
+        <div class="invalid-feedback">Time is required.</div>
+        </div>
+
+        <!-- Event Modality -->
+        <div class="mb-3">
+        <label for="event_modality" class="form-label">Modality</label>
+        <select class="form-select" id="event_modality" name="event_modality" required onchange="updateLocationOptions()">
+            <option value="" disabled selected>Select modality</option>
+            <option value="inperson">In-Person</option>
+            <option value="remote">Remote</option>
+        </select>
+        <div class="invalid-feedback">Please select a modality.</div>
+        </div>
+
+        <!-- Event Location (Conditional) -->
+        <div class="mb-3" id="location_field" style="display: none;">
+        <label for="event_location" class="form-label">Location</label>
+        <input type="text" class="form-control" id="event_location" name="event_location">
+        <div class="invalid-feedback">Location is required for in-person events.</div>
+        </div>
+
+        <!-- Event Remote URL (Conditional) -->
+        <div class="mb-3" id="remote_url_field" style="display: none;">
+        <label for="event_remote_url" class="form-label">Remote URL</label>
+        <input type="text" class="form-control" id="event_remote_url" name="event_remote_url" 
+            pattern="^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$">
+        <small class="form-text text-muted">Must be a valid URL starting with http:// or https://</small>
+        <div class="invalid-feedback">Please enter a valid remote URL.</div>
+        </div>
+
+        <!-- Event Attendees -->
+        <div class="mb-3">
+        <label for="event_attendees" class="form-label">Attendees</label>
+        <input type="text" class="form-control" id="event_attendees" name="event_attendees" placeholder="Comma-separated list of attendees">
+        </div>
+    </form>
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-primary" id="save_event_btn">Save Event</button>
+    </div>
+</div>
+</div>
+
+
+Second Prompt: 
+
+FIrst reset the form using this: document.getElementById('event_form').reset();
+
+Second declare this function and add it to the saveEvent(): function addEventToCalendarUI(eventInfo) {}
+
+Third: Create a helper function to build the HTML for each indvidual event card called: function 
+createEventCard(eventDetails) {} In this function, create a div eleemnt using: let event_element = 
+document.createElement('div'); Add some bootstrap classes to this to enhcnae to appeareance. also using 
+one more div using 
+
+Fourth, doument.createElement create a variable info and add all the event details to the inner HTML of this element. Use templated strings to simplify the appending data. You will need to append info into the event_element so simply create a appendChild() function that applies the info. Return event_element and for the addEventToCalendarUI() function, call createEventCard() function and pass it to the eventInfo and store a returned value to the variable. Then appropriated let event_card = createEventCard(eventInfo); Add this card to the appropriate day of the week, using document.getELementById(). Use the weekday attribute of the event to fetch the correct dev. Use the appendChild() to append this card to the weekday div. At the end of the saveEvent function use const myModalElement = document.getElementById('event_modal');
+const myModal = bootstrap.Modal.getOrCreateInstance(myModalElement);
+myModal.hide(); to hide the modal. 
+
+function updateLocationOptions() {
+  const modality = document.getElementById('event_modality').value;
+  const locationField = document.getElementById('location_field');
+  const remoteUrlField = document.getElementById('remote_url_field');
+  const locationInput = document.getElementById('event_location');
+  const remoteUrlInput = document.getElementById('event_remote_url');
+
+  // Show/hide fields based on modality selection
+  if (modality === 'inperson') {
+    locationField.style.display = 'block';
+    remoteUrlField.style.display = 'none';
+    locationInput.setAttribute('required', '');
+    remoteUrlInput.removeAttribute('required');
+  } else if (modality === 'remote') {
+    locationField.style.display = 'none';
+    remoteUrlField.style.display = 'block';
+    locationInput.removeAttribute('required');
+    remoteUrlInput.setAttribute('required', '');
+  } else {
+    locationField.style.display = 'none';
+    remoteUrlField.style.display = 'none';
+    locationInput.removeAttribute('required');
+    remoteUrlInput.removeAttribute('required');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const saveEventBtn = document.getElementById('save_event_btn');
+  const eventForm = document.getElementById('event_form');
+  const eventModal = document.getElementById('event_modal');
+
+  saveEventBtn.addEventListener('click', function() {
+    // Validate form
+    if (!eventForm.checkValidity()) {
+      eventForm.classList.add('was-validated');
+      return;
+    }
+
+    // Collect form data
+    const eventData = {
+      name: document.getElementById('event_name').value,
+      weekday: document.getElementById('event_weekday').value,
+      time: document.getElementById('event_time').value,
+      modality: document.getElementById('event_modality').value,
+      location: document.getElementById('event_location').value || null,
+      remoteUrl: document.getElementById('event_remote_url').value || null,
+      attendees: document.getElementById('event_attendees').value || null
+    };
+
+    console.log('Event saved:', eventData);
+    eventForm.classList.remove('was-validated');
+    updateLocationOptions();
+
+    addEventToCalendarUI(eventData);
+
+    const myModalElement = document.getElementById('event_modal');
+    const myModal = bootstrap.Modal.getOrCreateInstance(myModalElement);
+    myModal.hide();
+  });
+
+  // Reset form when modal is closed via Close button
+  eventModal.addEventListener('hidden.bs.modal', function() {
+    eventForm.classList.remove('was-validated');
+    eventForm.reset();
+    updateLocationOptions();
+  });
+});
+function createEventCard(eventDetails) {
+  let event_element = document.createElement('div');
+  event_element.classList.add('card', 'mt-2', 'shadow-sm', 'border-primary');
+
+  let info = document.createElement('div');
+  info.classList.add('card-body', 'p-2');
+  info.innerHTML = `
+    <h6 class="card-title text-truncate mb-1">${eventDetails.name}</h6>
+    <small class="text-muted d-block mb-1">
+      <strong>Time:</strong> ${eventDetails.time}
+    </small>
+    <small class="text-muted d-block mb-1">
+      <strong>Modality:</strong> ${eventDetails.modality === 'inperson' ? 'In-Person' : 'Remote'}
+    </small>
+    ${eventDetails.modality === 'inperson' && eventDetails.location ? `<small class="text-muted d-block mb-1"><strong>Location:</strong> ${eventDetails.location}</small>` : ''}
+    ${eventDetails.modality === 'remote' && eventDetails.remoteUrl ? `<small class="text-muted d-block mb-1"><strong>URL:</strong> <a href="${eventDetails.remoteUrl}" target="_blank" class="text-decoration-none">Join</a></small>` : ''}
+    ${eventDetails.attendees ? `<small class="text-muted d-block"><strong>Attendees:</strong> ${eventDetails.attendees}</small>` : ''}
+  `;
+
+  event_element.appendChild(info);
+  return event_element;
+}
+
+function addEventToCalendarUI(eventInfo) {
+  let event_card = createEventCard(eventInfo);
+  let dayElement = document.getElementById(eventInfo.weekday);
+  dayElement.appendChild(event_card);
+}
+
+Can you show me how I would implement a update on eventCards. 
+By clicking on the card, it would open the modal and allow me 
+to open to update its data.
+
+function editEvent(eventElement) {
+  const eventData = JSON.parse(eventElement.dataset.event);
+  document.getElementById('event_name').value = eventData.name;
+  document.getElementById('event_weekday').value = eventData.weekday;
+  document.getElementById('event_time').value = eventData.time;
+  document.getElementById('event_category').value = eventData.category;
+  document.getElementById('event_modality').value = eventData.modality;
+  document.getElementById('event_location').value = eventData.location || '';
+  document.getElementById('event_remote_url').value = eventData.remoteUrl || '';
+  document.getElementById('event_attendees').value = eventData.attendees || '';
+  updateLocationOptions();
+  eventElement.remove(); // Remove old card
+}
+
+  event_element.style.cursor = 'pointer';
+  event_element.dataset.event = JSON.stringify(eventDetails);
+  event_element.addEventListener('click', function() { editEvent(this); });
